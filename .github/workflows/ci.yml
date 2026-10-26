@@ -22,6 +22,7 @@ jobs:
 
   # Run the tests.
   test:
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
