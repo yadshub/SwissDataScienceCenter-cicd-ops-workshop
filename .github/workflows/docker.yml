@@ -12,6 +12,7 @@ on:
 permissions:
   contents: read
   packages: write
+  actions: read
 
 jobs:
   # Build the image from the `Dockerfile`.
@@ -43,3 +44,10 @@ jobs:
     uses: ./.github/workflows/train-docker.yml
     with:
       image_tag: ${{ github.sha }}
+
+  # Serve exactly the model that `train` just produced (same run).
+  deploy:
+    needs: train
+    uses: ./.github/workflows/deploy.yml
+    with:
+      model_run_id: ${{ github.run_id }}

@@ -35,6 +35,11 @@ class Prediction(BaseModel):
     probabilities: dict[str, float]
 
 
+@app.get("/health")
+def health() -> dict:
+    return {"status": "ok"}
+
+
 @app.post("/predict")
 def predict(flower: Flower) -> Prediction:
     X = np.array(
