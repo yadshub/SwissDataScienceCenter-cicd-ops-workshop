@@ -32,11 +32,12 @@ jobs:
       # Image names on GHCR must be lowercase.
       - name: Set the image name
         run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}:$IMAGE_TAG" >> "$GITHUB_ENV"
-      # TODO (Task 3): log in to the registry, pull the image, and run the training in it.
+      - name: Log in to the registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Pull the image
+        run: docker pull "$IMAGE"
       - name: Train
-        run: |
-          echo "TODO: pull $IMAGE and run the training in it."
-          exit 1
+        run: docker run --rm -v ./model:/app/model "$IMAGE"
       # Keep the trained model, so you can download it from the run's page.
       - uses: actions/upload-artifact@v7
         with:
