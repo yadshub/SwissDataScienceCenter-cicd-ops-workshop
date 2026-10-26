@@ -1,4 +1,5 @@
 import json
+import os
 import pathlib
 
 import joblib
@@ -10,8 +11,14 @@ from sklearn.model_selection import train_test_split
 MODEL_DIR = pathlib.Path("model")
 
 # Model settings.
-N_ESTIMATORS = 10  # number of trees in the forest
-MAX_DEPTH = None  # maximum depth of each tree; None means no limit
+# N_ESTIMATORS and MAX_DEPTH can be overridden with environment variables.
+N_ESTIMATORS = int(os.getenv("N_ESTIMATORS") or 10)  # number of trees in the forest
+# maximum depth of each tree; unset, empty or "None" means no limit
+MAX_DEPTH = (
+    None
+    if os.getenv("MAX_DEPTH", "None") in ("", "None")
+    else int(os.environ["MAX_DEPTH"])
+)
 RANDOM_STATE = 42  # fixed seed
 TEST_SIZE = 0.2  # test split fraction
 

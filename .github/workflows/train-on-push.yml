@@ -1,0 +1,22 @@
+# Train the model automatically, but only on `main` and only when `src/` changed.
+
+name: Train on push
+
+on:
+  push:
+    branches: [main]
+    paths: ["src/**"]
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.2
+      - run: uv sync --locked
+      - run: uv run python -m ci_cd.train
+      - uses: actions/upload-artifact@v7
+        with:
+          name: model
+          path: model/
+          retention-days: 30

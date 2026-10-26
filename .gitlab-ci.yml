@@ -15,10 +15,18 @@ stages:
 variables:
   PIP_ROOT_USER_ACTION: ignore
   UV_LINK_MODE: copy
+  UV_CACHE_DIR: .uv-cache
 
 # Shared settings.
 default:
   image: python:3.12
+  # Reuse the downloaded packages between jobs and pipelines.
+  cache:
+    key:
+      files:
+        - uv.lock
+    paths:
+      - .uv-cache/
   before_script:
     - pip install uv
     - uv sync --locked
@@ -30,16 +38,27 @@ lint:
     - uv run ruff format --check .
     - uv run ruff check .
 
-# Run the tests.
+# Run the tests, once per Python version.
 test:
   stage: test
+  image: python:$PYTHON_VERSION
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.12", "3.13", "3.14"]
   script:
     - uv run pytest tests/ -v
 
-# Train the model. Only runs when you click the `run` button in the interface.
+# Train the model. Runs by itself on `main` when `src/` changed, otherwise
+# it waits for the `run` button. Set N_ESTIMATORS and MAX_DEPTH as variables
+# when you start it to change the settings.
 train:
   stage: train
-  when: manual
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - src/**/*
+      when: on_success
+    - when: manual
   script:
     - uv run python -m ci_cd.train
   # Keep the trained model, so you can download it from the job page.

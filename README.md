@@ -38,6 +38,7 @@ To change:
 - `deployment.Dockerfile`: builds the image that serves the model.
 - The CI configuration:
    - `.github/workflows/ci.yml`: checks the code, and trains the model on demand.
+   - `.github/workflows/train-on-push.yml`: trains the model on `main` when `src/` changes.
    - `.github/workflows/docker.yml`: builds the image on every push.
    - `.github/workflows/train-docker.yml`: trains the model in an image from the registry.
    - `.github/workflows/deploy.yml`: serves the model in a container, and checks that it answers.
